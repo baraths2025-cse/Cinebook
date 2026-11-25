@@ -1,0 +1,562 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Select Seats - CineBook</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    margin: 0;
+    background: #f5f5f7;
+    color: #222;
+}
+
+header {
+    background: #20202c;
+    color: white;
+    padding: 18px 7%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h2 {
+    color: #f5c518;
+    margin: 0;
+}
+
+header a {
+    color: white;
+    text-decoration: none;
+}
+
+.container {
+    max-width: 1050px;
+    margin: 25px auto;
+    padding: 20px;
+    text-align: center;
+}
+
+h1 {
+    font-size: 25px;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: #777;
+    margin-bottom: 25px;
+}
+
+.section {
+    margin: 30px auto;
+}
+
+.section-title {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 18px;
+    color: #444;
+}
+
+.seat-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin: 8px auto;
+}
+
+.row-label {
+    width: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #555;
+}
+
+.seat-block {
+    display: flex;
+    gap: 5px;
+}
+
+.aisle {
+    width: 35px;
+}
+
+.seat {
+    width: 30px;
+    height: 27px;
+    border: 1px solid #777;
+    background: white;
+    border-radius: 5px 5px 2px 2px;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+.seat:hover:not(:disabled) {
+    border-color: #6b4eff;
+}
+
+.seat.selected {
+    background: #7654ff;
+    color: white;
+    border-color: #7654ff;
+}
+
+.seat.booked {
+    background: #bdbdbd;
+    border-color: #bdbdbd;
+    cursor: not-allowed;
+}
+
+.screen-area {
+    margin: 45px auto 20px;
+    max-width: 400px;
+}
+
+.screen {
+    height: 22px;
+    border-bottom: 5px solid #9575ff;
+    border-radius: 50%;
+    transform: perspective(100px) rotateX(-10deg);
+}
+
+.screen-text {
+    font-size: 11px;
+    color: #7654ff;
+    letter-spacing: 3px;
+    margin-top: 20px;
+}
+
+.legend {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    flex-wrap: wrap;
+    margin: 25px 0;
+    font-size: 13px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.legend-box {
+    width: 13px;
+    height: 13px;
+    border-radius: 3px;
+}
+
+.available-box {
+    background: white;
+    border: 1px solid #777;
+}
+
+.selected-box {
+    background: #7654ff;
+}
+
+.booked-box {
+    background: #bdbdbd;
+}
+
+.booking-panel {
+    background: white;
+    max-width: 550px;
+    margin: 30px auto;
+    padding: 22px;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px #00000012;
+}
+
+.booking-panel p {
+    margin: 10px;
+}
+
+#bookButton {
+    background: #7654ff;
+    color: white;
+    border: none;
+    padding: 13px 35px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 12px;
+}
+
+#bookButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+#message {
+    font-size: 14px;
+    margin-top: 15px;
+}
+
+footer {
+    background: #20202c;
+    color: white;
+    text-align: center;
+    padding: 18px;
+}
+
+footer a {
+    color: #f5c518;
+    text-decoration: none;
+}
+
+@media(max-width: 650px) {
+    .container {
+        padding: 10px 3px;
+    }
+
+    .seat-row {
+        gap: 5px;
+    }
+
+    .seat-block {
+        gap: 2px;
+    }
+
+    .seat {
+        width: 22px;
+        height: 25px;
+        font-size: 8px;
+    }
+
+    .aisle {
+        width: 12px;
+    }
+
+    .row-label {
+        width: 13px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h2>CineBook</h2>
+    <a href="index.html">Home</a>
+</header>
+
+<div class="container">
+
+    <h1>Select Your Seats</h1>
+    <p class="subtitle">Choose your favourite seats</p>
+
+    <div class="legend">
+        <div class="legend-item">
+            <span class="legend-box available-box"></span>
+            Available
+        </div>
+
+        <div class="legend-item">
+            <span class="legend-box booked-box"></span>
+            Occupied
+        </div>
+
+        <div class="legend-item">
+            <span class="legend-box selected-box"></span>
+            Selected
+        </div>
+    </div>
+
+    <div id="seatSections"></div>
+
+    <div class="screen-area">
+        <div class="screen"></div>
+        <p class="screen-text">SCREEN THIS WAY</p>
+    </div>
+
+    <div class="booking-panel">
+        <p id="selectedInfo">Selected seats: None</p>
+        <h3 id="totalPrice">Total: ₹0</h3>
+
+        <button id="bookButton">Confirm Booking</button>
+
+        <p id="message"></p>
+    </div>
+
+</div>
+
+<footer>
+    CineBook © 2026
+    <p><a href="index.html">Back to Home</a></p>
+</footer>
+
+<script>
+
+const showId = new URLSearchParams(window.location.search).get("id");
+
+const selectedSeats = new Set();
+const bookedSeats = new Set();
+
+const seatSections = document.getElementById("seatSections");
+const selectedInfo = document.getElementById("selectedInfo");
+const totalPrice = document.getElementById("totalPrice");
+const message = document.getElementById("message");
+const bookButton = document.getElementById("bookButton");
+
+let ticketPrice = 0;
+
+const sections = [
+    {
+        name: "PLATINUM",
+        rows: "ABCDEFGHIJKLMN",
+        multiplier: 1
+    },
+    {
+        name: "GOLD",
+        rows: "OPQRSTUV",
+        multiplier: 0.75
+    },
+    {
+        name: "SILVER",
+        rows: "W",
+        multiplier: 0.50
+    }
+];
+
+function getSeatPrice(section) {
+    return Math.round(ticketPrice * section.multiplier * 100) / 100;
+}
+
+function createSeat(row, number) {
+
+    const seatName = row + number;
+
+    const button = document.createElement("button");
+
+    button.className = "seat";
+    button.textContent = number;
+
+    if (bookedSeats.has(seatName)) {
+
+        button.classList.add("booked");
+        button.disabled = true;
+
+    } else {
+
+        if (selectedSeats.has(seatName)) {
+            button.classList.add("selected");
+        }
+
+        button.addEventListener("click", () => {
+
+            if (selectedSeats.has(seatName)) {
+                selectedSeats.delete(seatName);
+            } else {
+                selectedSeats.add(seatName);
+            }
+
+            renderSeats();
+
+        });
+    }
+
+    return button;
+}
+
+function renderSeats() {
+
+    seatSections.innerHTML = "";
+
+    sections.forEach(section => {
+
+        const sectionDiv = document.createElement("div");
+        sectionDiv.className = "section";
+
+        const title = document.createElement("div");
+        title.className = "section-title";
+        title.textContent = section.name + " - ₹" + getSeatPrice(section);
+
+        sectionDiv.appendChild(title);
+
+        section.rows.split("").forEach(row => {
+
+            const rowDiv = document.createElement("div");
+            rowDiv.className = "seat-row";
+
+            const label = document.createElement("span");
+            label.className = "row-label";
+            label.textContent = row;
+
+            const leftBlock = document.createElement("div");
+            leftBlock.className = "seat-block";
+
+            const rightBlock = document.createElement("div");
+            rightBlock.className = "seat-block";
+
+            for (let i = 1; i <= 9; i++) {
+                leftBlock.appendChild(createSeat(row, i));
+            }
+
+            for (let i = 10; i <= 18; i++) {
+                rightBlock.appendChild(createSeat(row, i));
+            }
+
+            const aisle = document.createElement("div");
+            aisle.className = "aisle";
+
+            rowDiv.appendChild(label);
+            rowDiv.appendChild(leftBlock);
+            rowDiv.appendChild(aisle);
+            rowDiv.appendChild(rightBlock);
+
+            sectionDiv.appendChild(rowDiv);
+        });
+
+        seatSections.appendChild(sectionDiv);
+    });
+
+    updateSelection();
+}
+
+function updateSelection() {
+
+    const seats = [...selectedSeats];
+
+    selectedInfo.textContent = seats.length
+        ? "Selected seats: " + seats.join(", ")
+        : "Selected seats: None";
+
+    const total = seats.reduce((sum, seat) => {
+
+        const row = seat.charAt(0);
+
+        const section = sections.find(s => s.rows.includes(row));
+
+        return sum + (section ? getSeatPrice(section) : 0);
+
+    }, 0);
+
+    totalPrice.textContent = "Total: ₹" + total;
+}
+
+async function loadShowPrice() {
+
+    const response = await fetch("/api/shows");
+
+    if (!response.ok) {
+        throw new Error("Unable to load show details");
+    }
+
+    const shows = await response.json();
+
+    const currentShow = shows.find(
+        show => Number(show.id) === Number(showId)
+    );
+
+    if (!currentShow) {
+        throw new Error("Show not found");
+    }
+
+    ticketPrice = Number(currentShow.ticketPrice);
+
+    if (!Number.isFinite(ticketPrice) || ticketPrice <= 0) {
+        throw new Error("Invalid show ticket price");
+    }
+}
+
+async function loadSeats() {
+
+    if (!showId) {
+        message.textContent = "Show ID is missing.";
+        bookButton.disabled = true;
+        return;
+    }
+
+    try {
+
+        await loadShowPrice();
+
+        const response = await fetch(
+            `/api/seats/booked/${encodeURIComponent(showId)}`
+        );
+
+        if (!response.ok) {
+            throw new Error("Unable to load seats");
+        }
+
+        const seats = await response.json();
+
+        seats.forEach(seat => bookedSeats.add(seat));
+
+        renderSeats();
+
+    } catch (error) {
+
+        console.error(error);
+        message.textContent = "Unable to load show or seat details.";
+        bookButton.disabled = true;
+
+    }
+}
+
+bookButton.addEventListener("click", async () => {
+
+    if (selectedSeats.size === 0) {
+        message.textContent = "Please select seats.";
+        return;
+    }
+
+    bookButton.disabled = true;
+    message.textContent = "Processing booking...";
+
+    try {
+
+        const response = await fetch("/api/bookings", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                showId: Number(showId),
+                seats: [...selectedSeats].join(",")
+            })
+        });
+
+        const result = await response.text();
+
+        if (!response.ok) {
+            message.textContent = result;
+            await loadSeats();
+            return;
+        }
+
+        message.textContent = "Booking successful!";
+
+        selectedSeats.clear();
+
+        await loadSeats();
+
+    } catch (error) {
+
+        console.error(error);
+        message.textContent = "Booking failed. Please try again.";
+
+    } finally {
+
+        bookButton.disabled = false;
+
+    }
+});
+
+loadSeats();
+
+</script>
+
+</body>
+</html>

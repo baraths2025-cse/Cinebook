@@ -1,0 +1,693 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Movie Shows - CineBook</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'DM Sans', sans-serif;
+}
+
+body {
+    background: #0c0c12;
+    color: white;
+    min-height: 100vh;
+}
+
+/* HEADER */
+
+header {
+    background: #15151f;
+    padding: 22px 8%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #292936;
+}
+
+.logo {
+    font-family: 'Outfit', sans-serif;
+    font-size: 27px;
+    font-weight: 800;
+    color: #f5c518;
+}
+
+header a {
+    color: #ddd;
+    text-decoration: none;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+header a:hover {
+    color: #f5c518;
+}
+
+/* MAIN */
+
+.container {
+    max-width: 1250px;
+    margin: auto;
+    padding: 55px 30px;
+}
+
+.page-heading {
+    margin-bottom: 38px;
+}
+
+.page-heading h1 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 38px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.page-heading h1 span {
+    color: #f5c518;
+}
+
+.page-heading p {
+    color: #9999a8;
+    font-size: 15px;
+}
+
+/* SHOW GRID */
+
+#showList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 25px;
+}
+
+/* SHOW CARD */
+
+.show-card {
+    background: linear-gradient(145deg, #20202d, #171720);
+    border: 1px solid #343444;
+    border-radius: 16px;
+    padding: 30px;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: 0.3s ease;
+}
+
+.show-card:hover {
+    transform: translateY(-5px);
+    border-color: #f5c518;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.3);
+}
+
+.show-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.show-number {
+    color: #f5c518;
+    font-family: 'Outfit', sans-serif;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.available-tag {
+    color: #4ade80;
+    background: rgba(74,222,128,0.1);
+    padding: 7px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.show-date {
+    color: #aaaab8;
+    font-size: 14px;
+    margin-bottom: 9px;
+}
+
+.show-time {
+    font-family: 'Outfit', sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 25px;
+}
+
+.show-footer {
+    border-top: 1px solid #383846;
+    padding-top: 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.price-label {
+    color: #9999a8;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.show-price {
+    color: #f5c518;
+    font-size: 25px;
+    font-weight: 800;
+    font-family: 'Outfit', sans-serif;
+}
+
+/* BUTTONS */
+
+button {
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 14px;
+    border-radius: 8px;
+    transition: 0.25s;
+}
+
+.select-button {
+    background: #f5c518;
+    color: #111;
+    padding: 14px 18px;
+}
+
+.select-button:hover {
+    background: #ffda36;
+    transform: scale(1.03);
+}
+
+.delete-btn {
+    background: #b83232;
+    color: white;
+    padding: 13px 18px;
+}
+
+.delete-btn:hover {
+    background: #e53935;
+}
+
+/* EMPTY MESSAGE */
+
+.empty-message {
+    color: #aaa;
+    background: #20202c;
+    padding: 25px;
+    border-radius: 10px;
+    grid-column: 1 / -1;
+}
+
+/* ADMIN SECTION */
+
+.admin-section {
+    background: #191923;
+    border: 1px solid #393948;
+    border-radius: 16px;
+    padding: 35px;
+    margin-top: 65px;
+}
+
+.admin-section h2 {
+    font-family: 'Outfit', sans-serif;
+    color: #f5c518;
+    font-size: 27px;
+    margin-bottom: 25px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.form-group label {
+    display: block;
+    color: #ccc;
+    margin-bottom: 9px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    background: #101018;
+    color: white;
+    border: 1px solid #424252;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+}
+
+input:focus {
+    border-color: #f5c518;
+}
+
+input::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+}
+
+.add-button {
+    background: #f5c518;
+    color: #111;
+    padding: 15px 25px;
+    margin-top: 25px;
+}
+
+.add-button:hover {
+    background: #ffda36;
+}
+
+#message {
+    margin-top: 18px;
+    font-weight: 600;
+}
+
+.success {
+    color: #4ade80;
+}
+
+.error {
+    color: #ff6b6b;
+}
+
+/* FOOTER */
+
+footer {
+    background: #15151f;
+    border-top: 1px solid #292936;
+    text-align: center;
+    padding: 25px;
+    color: #888;
+    margin-top: 50px;
+    font-size: 13px;
+}
+
+/* TABLET */
+
+@media(max-width: 768px) {
+    .container {
+        padding: 40px 22px;
+    }
+
+    .page-heading h1 {
+        font-size: 32px;
+    }
+
+    #showList {
+        grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    }
+
+    .show-card {
+        min-height: 285px;
+    }
+}
+
+/* MOBILE */
+
+@media(max-width: 550px) {
+    header {
+        padding: 18px 22px;
+    }
+
+    .container {
+        padding: 35px 18px;
+    }
+
+    .page-heading h1 {
+        font-size: 29px;
+    }
+
+    #showList {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .show-card {
+        padding: 25px;
+        min-height: 280px;
+    }
+
+    .show-time {
+        font-size: 33px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-section {
+        padding: 24px 18px;
+    }
+
+    .show-footer {
+        align-items: flex-end;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">CineBook.</div>
+    <a href="index.html">← Back to Home</a>
+</header>
+
+<main class="container">
+
+    <div class="page-heading">
+        <h1>Choose Your <span>Show</span></h1>
+        <p>Select your preferred show time and book your movie tickets.</p>
+    </div>
+
+    <div id="showList">
+        <p class="empty-message">Loading shows...</p>
+    </div>
+
+    <section class="admin-section" id="adminSection" style="display:none;">
+
+        <h2>Add New Show</h2>
+
+        <form id="showForm">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label for="showDate">Show Date</label>
+                    <input type="date" id="showDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="showTime">Show Time</label>
+                    <input type="time" id="showTime" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="ticketPrice">Ticket Price (₹)</label>
+                    <input type="number" id="ticketPrice" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="totalSeats">Total Seats</label>
+                    <input type="number" id="totalSeats" min="1" value="414" required>
+                </div>
+
+            </div>
+
+            <button type="submit" class="add-button">+ Add Show</button>
+
+        </form>
+
+        <div id="message" role="status"></div>
+
+    </section>
+
+</main>
+
+<footer>
+    CineBook © 2026 | Your Movie Experience Starts Here
+</footer>
+
+<script>
+
+const movieId = new URLSearchParams(window.location.search).get("id");
+
+const showList = document.getElementById("showList");
+const showForm = document.getElementById("showForm");
+const message = document.getElementById("message");
+
+let isAdmin = false;
+
+async function loadShows() {
+
+    if (!movieId) {
+        showList.textContent = "Movie ID is missing.";
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            `/api/shows/movie/${encodeURIComponent(movieId)}`
+        );
+
+        if (!response.ok) {
+            throw new Error("Unable to load shows");
+        }
+
+        const shows = await response.json();
+
+        const currentTime = new Date();
+
+        const visibleShows = isAdmin
+            ? shows
+            : shows.filter(show => {
+                const showDateTime = new Date(
+                    `${show.showDate}T${show.showTime}`
+                );
+                return showDateTime > currentTime;
+            });
+
+        if (visibleShows.length === 0) {
+            showList.innerHTML = `
+                <p class="empty-message">
+                    ${isAdmin
+                        ? "No shows available."
+                        : "No upcoming shows available."}
+                </p>`;
+            return;
+        }
+
+        showList.innerHTML = visibleShows.map(show => {
+
+            const formattedTime = new Date(
+                "2000-01-01T" + show.showTime
+            ).toLocaleTimeString("en-US", {
+                hour: "numeric",
+                minute: "2-digit",
+                hour12: true
+            });
+
+            const formattedDate = new Date(
+                show.showDate + "T00:00:00"
+            ).toLocaleDateString("en-IN", {
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+            });
+
+            return `
+                <div class="show-card">
+
+                    <div>
+                        <div class="show-top">
+                            <span class="show-number">
+                                SHOW #${show.id}
+                            </span>
+
+                            <span class="available-tag">
+                                ${isAdmin ? "ADMIN VIEW" : "AVAILABLE"}
+                            </span>
+                        </div>
+
+                        <p class="show-date">${formattedDate}</p>
+
+                        <div class="show-time">
+                            ${formattedTime}
+                        </div>
+                    </div>
+
+                    <div class="show-footer">
+
+                        <div>
+                            <div class="price-label">TICKET PRICE</div>
+                            <div class="show-price">
+                                ₹${show.ticketPrice}
+                            </div>
+                        </div>
+
+                        ${!isAdmin ? `
+                            <button class="select-button"
+                                onclick="selectShow(${show.id})">
+                                Select Seats →
+                            </button>
+                        ` : `
+                            <button class="delete-btn"
+                                onclick="deleteShow(${show.id})">
+                                Delete
+                            </button>
+                        `}
+
+                    </div>
+
+                </div>
+            `;
+
+        }).join("");
+
+    } catch (error) {
+        showList.textContent = "Unable to load shows.";
+    }
+}
+
+function selectShow(showId) {
+    window.location.href = `seats.html?id=${showId}`;
+}
+
+showForm.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    if (!movieId) {
+        message.textContent = "Movie ID is missing.";
+        message.className = "error";
+        return;
+    }
+
+    const showData = {
+        movieId: Number(movieId),
+        showDate: document.getElementById("showDate").value,
+        showTime: document.getElementById("showTime").value + ":00",
+        ticketPrice: Number(
+            document.getElementById("ticketPrice").value
+        ),
+        totalSeats: Number(
+            document.getElementById("totalSeats").value
+        )
+    };
+
+    try {
+
+        const response = await fetch("/api/shows", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(showData)
+        });
+
+        if (response.ok) {
+
+            message.textContent = "Show added successfully!";
+            message.className = "success";
+
+            showForm.reset();
+            document.getElementById("totalSeats").value = 414;
+
+            await loadShows();
+
+        } else if (response.status === 401 ||
+                   response.status === 403) {
+
+            message.textContent =
+                "Only an ADMIN can add shows. Please log in as ADMIN.";
+            message.className = "error";
+
+        } else {
+
+            const errorText = await response.text();
+
+            message.textContent = errorText || "Failed to add show.";
+            message.className = "error";
+        }
+
+    } catch (error) {
+
+        message.textContent = "Server connection failed.";
+        message.className = "error";
+    }
+});
+
+async function checkAdminRole() {
+
+    const adminSection = document.getElementById("adminSection");
+
+    try {
+
+        const response = await fetch("/api/auth/me");
+
+        if (!response.ok) {
+
+            adminSection.style.display = "none";
+            isAdmin = false;
+
+        } else {
+
+            const user = await response.json();
+
+            isAdmin = user.role === "ADMIN";
+
+            adminSection.style.display = isAdmin ? "block" : "none";
+        }
+
+    } catch (error) {
+
+        isAdmin = false;
+        adminSection.style.display = "none";
+    }
+
+    await loadShows();
+}
+
+async function deleteShow(showId) {
+
+    const confirmDelete = confirm(
+        "Are you sure you want to delete this show?"
+    );
+
+    if (!confirmDelete) {
+        return;
+    }
+
+    try {
+
+        const response = await fetch(`/api/shows/${showId}`, {
+            method: "DELETE"
+        });
+
+        if (response.ok) {
+
+            message.textContent = "Show deleted successfully!";
+            message.className = "success";
+
+            await loadShows();
+
+        } else if (response.status === 401 ||
+                   response.status === 403) {
+
+            message.textContent = "Only ADMIN can delete shows.";
+            message.className = "error";
+
+        } else {
+
+            message.textContent = "Unable to delete show.";
+            message.className = "error";
+        }
+
+    } catch (error) {
+
+        message.textContent = "Server connection failed.";
+        message.className = "error";
+    }
+}
+
+checkAdminRole();
+
+</script>
+
+</body>
+</html>

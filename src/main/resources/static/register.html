@@ -1,0 +1,148 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - CineBook</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #101018;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: #20202c;
+            padding: 35px;
+            width: 350px;
+            border-radius: 12px;
+        }
+
+        h1 {
+            color: #f5c518;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 6px;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #f5c518;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #d9ae10;
+        }
+
+        p {
+            text-align: center;
+            margin-top: 18px;
+        }
+
+        a {
+            color: #f5c518;
+            text-decoration: none;
+        }
+
+        #message {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>CineBook</h1>
+
+    <form id="registerForm">
+
+        <input type="text" id="name"
+               placeholder="Full Name" required>
+
+        <input type="email" id="email"
+               placeholder="Email Address" required>
+
+        <input type="password" id="password"
+               placeholder="Password" required minlength="6">
+
+        <button type="submit">Create Account</button>
+
+    </form>
+
+    <p id="message"></p>
+
+    <p>Already have an account?
+        <a href="login.html">Login</a>
+    </p>
+
+    <p><a href="index.html">Back to Home</a></p>
+
+</div>
+
+<script>
+    document.getElementById("registerForm")
+        .addEventListener("submit", async function(event) {
+
+        event.preventDefault();
+
+        const user = {
+            name: document.getElementById("name").value,
+            email: document.getElementById("email").value,
+            password: document.getElementById("password").value
+        };
+
+        const message = document.getElementById("message");
+
+        try {
+            const response = await fetch("/api/auth/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(user)
+            });
+
+            const result = await response.text();
+
+            message.textContent = result;
+
+            if (response.ok && result === "Registration successful") {
+                document.getElementById("registerForm").reset();
+            }
+
+        } catch (error) {
+            message.textContent = "Registration failed. Try again.";
+        }
+    });
+</script>
+
+</body>
+</html>

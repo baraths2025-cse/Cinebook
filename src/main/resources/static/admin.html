@@ -1,0 +1,479 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - CineBook</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #101018;
+            color: white;
+            min-height: 100vh;
+        }
+
+        header {
+            background: #20202c;
+            padding: 20px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h2 {
+            color: #f5c518;
+        }
+
+        header a {
+            color: white;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: 45px auto;
+            padding: 30px;
+            background: #20202c;
+            border-radius: 12px;
+        }
+
+        h1 {
+            color: #f5c518;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #bbb;
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin: 15px 0 8px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #444;
+            border-radius: 6px;
+            background: #101018;
+            color: white;
+            font-size: 15px;
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            margin-top: 25px;
+            background: #f5c518;
+            color: black;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #d9ad00;
+        }
+
+        .section-divider {
+            border: none;
+            border-top: 1px solid #444;
+            margin: 40px 0;
+        }
+
+        #movieMessage, #message {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .success {
+            color: #4ade80;
+        }
+
+        .error {
+            color: #ff6b6b;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h2>CineBook Admin</h2>
+    <a href="index.html">Back to Home</a>
+</header>
+
+<div class="container">
+
+    <!-- ADD MOVIE SECTION -->
+
+    <h1>Add New Movie</h1>
+    <p>Enter the movie details to add a new movie to CineBook.</p>
+
+    <form id="movieForm">
+
+        <label for="title">Movie Title</label>
+        <input type="text" id="title" required>
+
+        <label for="description">Description</label>
+        <textarea id="description" required></textarea>
+
+        <label for="genre">Genre</label>
+        <input type="text" id="genre" required>
+
+        <label for="language">Language</label>
+        <input type="text" id="language" required>
+
+        <label for="duration">Duration (minutes)</label>
+        <input type="number" id="duration" min="1" required>
+
+       <label for="poster">Choose Movie Poster</label>
+       <input type="file" id="poster" accept="image/png,image/jpeg,image/webp,image/gif" required>
+
+        <button type="submit">Add Movie</button>
+
+    </form>
+
+    <div id="movieMessage" role="status"></div>
+
+    <hr class="section-divider">
+
+    <!-- EXISTING ADD SHOW SECTION - UNCHANGED -->
+
+    <h1>Add New Show</h1>
+    <p>Select a movie and enter its show details.</p>
+
+    <form id="showForm">
+
+        <label for="movieId">Select Movie</label>
+        <select id="movieId" required>
+            <option value="">Loading movies...</option>
+        </select>
+
+        <label for="showDate">Show Date</label>
+        <input type="date" id="showDate" required>
+
+        <label for="showTime">Show Time</label>
+        <input type="time" id="showTime" required>
+
+        <label for="ticketPrice">Ticket Price (₹)</label>
+        <input type="number" id="ticketPrice" min="1" required>
+
+        <label for="totalSeats">Total Seats</label>
+        <input type="number" id="totalSeats" min="1" value="414" required>
+
+        <button type="submit">Add Show</button>
+
+    </form>
+
+    <div id="message" role="status"></div>
+
+</div>
+
+<hr class="section-divider">
+
+<h1>Manage Movies</h1>
+<p>View, edit or delete movies in CineBook.</p>
+
+<div id="manageMovieList"></div>
+
+
+<script>
+    const movieSelect = document.getElementById("movieId");
+    const message = document.getElementById("message");
+    const showForm = document.getElementById("showForm");
+
+    // ADD MOVIE FUNCTIONALITY
+
+    const movieForm = document.getElementById("movieForm");
+    const movieMessage = document.getElementById("movieMessage");
+
+    
+movieForm.addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const movieData = new FormData();
+
+    movieData.append("title", document.getElementById("title").value);
+    movieData.append("description", document.getElementById("description").value);
+    movieData.append("genre", document.getElementById("genre").value);
+    movieData.append("language", document.getElementById("language").value);
+    movieData.append("duration", document.getElementById("duration").value);
+    movieData.append("poster", document.getElementById("poster").files[0]);
+
+    try {
+        const response = await fetch("/api/movies/upload", {
+            method: "POST",
+            body: movieData
+        });
+
+        if (response.ok) {
+            movieMessage.textContent = "Movie added successfully!";
+            movieMessage.className = "success";
+
+            movieForm.reset();
+            await loadMovies();
+
+        } else {
+            const errorText = await response.text();
+            movieMessage.textContent = errorText || "Failed to add movie.";
+            movieMessage.className = "error";
+        }
+
+    } catch (error) {
+        movieMessage.textContent = "Server connection failed.";
+        movieMessage.className = "error";
+    }
+});
+
+
+
+    // EXISTING LOAD MOVIES FUNCTION
+
+    async function loadMovies() {
+        try {
+            const response = await fetch("/api/movies");
+
+            if (!response.ok) {
+                throw new Error("Unable to load movies");
+            }
+
+            const movies = await response.json();
+
+            movieSelect.innerHTML =
+                '<option value="">Choose a movie</option>';
+
+            movies.forEach(movie => {
+                const option = document.createElement("option");
+                option.value = movie.id;
+                option.textContent = movie.title;
+                movieSelect.appendChild(option);
+            });
+
+        } catch (error) {
+            movieSelect.innerHTML =
+                '<option value="">Failed to load movies</option>';
+
+            message.textContent = error.message;
+            message.className = "error";
+        }
+    }
+
+
+    // EXISTING ADD SHOW FUNCTION - UNCHANGED
+
+    showForm.addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const showData = {
+            movieId: Number(movieSelect.value),
+            showDate: document.getElementById("showDate").value,
+            showTime: document.getElementById("showTime").value + ":00",
+            ticketPrice: Number(document.getElementById("ticketPrice").value),
+            totalSeats: Number(document.getElementById("totalSeats").value)
+        };
+
+        try {
+            const response = await fetch("/api/shows", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(showData)
+            });
+
+            if (response.ok) {
+                message.textContent = "Show added successfully!";
+                message.className = "success";
+                showForm.reset();
+                document.getElementById("totalSeats").value = 414;
+            } else if (response.status === 401 || response.status === 403) {
+                message.textContent =
+                    "Admin login required. Please log in as ADMIN.";
+                message.className = "error";
+            } else {
+                const errorText = await response.text();
+                message.textContent =
+                    errorText || "Failed to add show.";
+                message.className = "error";
+            }
+
+        } catch (error) {
+            message.textContent = "Server connection failed.";
+            message.className = "error";
+        }
+    });
+    
+// MANAGE MOVIES
+
+async function loadManageMovies() {
+    const movieList = document.getElementById("manageMovieList");
+
+    try {
+        const response = await fetch("/api/movies");
+
+        if (!response.ok) {
+            throw new Error("Unable to load movies");
+        }
+
+        const movies = await response.json();
+
+        if (movies.length === 0) {
+            movieList.innerHTML = "<p>No movies available.</p>";
+            return;
+        }
+
+        movieList.innerHTML = movies.map(movie => `
+            <div style="
+                background:#101018;
+                padding:15px;
+                margin-top:15px;
+                border-radius:8px;
+                display:flex;
+                align-items:center;
+                gap:15px;
+                flex-wrap:wrap;
+            ">
+                <img src="${movie.posterUrl || ''}"
+                     alt="${movie.title}"
+                     style="width:75px;height:100px;object-fit:cover;">
+
+                <div style="flex:1;">
+                    <h3>${movie.title}</h3>
+                    <p>${movie.genre || ''} | ${movie.language || ''}</p>
+                    <p>${movie.duration} minutes</p>
+                </div>
+
+                <button type="button"
+                        style="width:auto;margin:5px;padding:10px;"
+                        onclick="editMovie(${movie.id})">
+                    Edit
+                </button>
+
+                <button type="button"
+                        style="width:auto;margin:5px;padding:10px;background:#ff6b6b;"
+                        onclick="deleteMovie(${movie.id})">
+                    Delete
+                </button>
+            </div>
+        `).join("");
+
+    } catch (error) {
+        movieList.innerHTML = "<p>Unable to load movies.</p>";
+    }
+}
+
+
+// EDIT MOVIE
+
+async function editMovie(id) {
+    try {
+        const response = await fetch("/api/movies/" + id);
+
+        if (!response.ok) {
+            alert("Unable to find movie.");
+            return;
+        }
+
+        const movie = await response.json();
+
+        const title = prompt("Enter movie title:", movie.title);
+        if (title === null || !title.trim()) return;
+
+        const description = prompt("Enter description:", movie.description || "");
+        if (description === null) return;
+
+        const genre = prompt("Enter genre:", movie.genre || "");
+        if (genre === null) return;
+
+        const language = prompt("Enter language:", movie.language || "");
+        if (language === null) return;
+
+        const duration = prompt("Enter duration in minutes:", movie.duration);
+        if (duration === null || !Number.isInteger(Number(duration)) ||
+            Number(duration) < 1) {
+            alert("Enter a valid duration.");
+            return;
+        }
+
+        const updatedMovie = {
+            title: title.trim(),
+            description: description,
+            genre: genre,
+            language: language,
+            duration: Number(duration),
+            posterUrl: movie.posterUrl
+        };
+
+        const updateResponse = await fetch("/api/movies/" + id, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(updatedMovie)
+        });
+
+        if (updateResponse.ok) {
+            alert("Movie updated successfully!");
+            await loadManageMovies();
+            await loadMovies();
+        } else {
+            alert("Failed to update movie.");
+        }
+
+    } catch (error) {
+        alert("Server connection failed.");
+    }
+}
+
+
+// DELETE MOVIE
+
+async function deleteMovie(id) {
+    if (!confirm("Are you sure you want to delete this movie?")) {
+        return;
+    }
+
+    try {
+        const response = await fetch("/api/movies/" + id, {
+            method: "DELETE"
+        });
+
+        if (response.ok) {
+            alert("Movie deleted successfully!");
+            await loadManageMovies();
+            await loadMovies();
+        } else {
+            alert("Unable to delete movie. It may have existing shows.");
+        }
+
+    } catch (error) {
+        alert("Server connection failed.");
+    }
+}
+
+loadManageMovies();
+
+
+    loadMovies();
+</script>
+
+</body>
+</html>
